@@ -7,11 +7,10 @@ import CreateQR from "../pages/create-qr/page";
 import Details from "../pages/details/page";
 import LandingPage from "../pages/landing/page";
 
-
 const routes: RouteObject[] = [
   {
     path: "/",
-    element: <Login />,
+    element: <LandingPage />,
   },
   {
     path: "/login",
@@ -33,7 +32,8 @@ const routes: RouteObject[] = [
     path: "/details/:qrId",
     element: <Details />,
   },
-  {path: "/landing",element:<LandingPage />},
+  { path: "/landing", 
+    element: <LandingPage /> },
   {
     path: "*",
     element: <NotFound />,

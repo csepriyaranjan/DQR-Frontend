@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   BiQrScan,
@@ -7,6 +8,17 @@ import {
 } from "react-icons/bi";
 
 export default function LandingPage() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // Simple check for the 'refreshToken' in cookies
+    const hasToken = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("refreshToken="));
+
+    setIsLoggedIn(!!hasToken);
+  }, []);
+
   return (
     <div className="min-h-screen bg-white text-black font-sans">
       {/* Navigation */}
@@ -17,19 +29,31 @@ export default function LandingPage() {
           </div>
           <span className="text-xl font-bold tracking-tight">QRFlow</span>
         </div>
+
         <div className="flex items-center gap-6">
-          <Link
-            to="/login"
-            className="text-sm font-medium hover:text-gray-600 transition-colors"
-          >
-            Log in
-          </Link>
-          <Link
-            to="/signup"
-            className="bg-black text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-gray-800 transition-all"
-          >
-            Get Started
-          </Link>
+          {isLoggedIn ? (
+            <Link
+              to="/dashboard"
+              className="bg-black text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-gray-800 transition-all shadow-md"
+            >
+              Dashboard
+            </Link>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="text-sm font-medium hover:text-gray-600 transition-colors"
+              >
+                Log in
+              </Link>
+              <Link
+                to="/signup"
+                className="bg-black text-white px-5 py-2.5 rounded-full text-sm font-medium hover:bg-gray-800 transition-all"
+              >
+                Get Started
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
@@ -45,10 +69,10 @@ export default function LandingPage() {
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
-            to="/signup"
+            to={isLoggedIn ? "/dashboard" : "/signup"}
             className="w-full sm:w-auto bg-black text-white px-8 py-4 rounded-full font-bold text-lg hover:bg-gray-800 transition-all shadow-lg shadow-black/10"
           >
-            Create Your Free QR
+            {isLoggedIn ? "Go to Dashboard" : "Create Your Free QR"}
           </Link>
           <a
             href="#pricing"
@@ -131,10 +155,10 @@ export default function LandingPage() {
               </li>
             </ul>
             <Link
-              to="/signup"
+              to={isLoggedIn ? "/dashboard" : "/signup"}
               className="block text-center w-full py-3 rounded-xl border border-gray-200 font-bold hover:bg-gray-50 transition-all"
             >
-              Get Started
+              {isLoggedIn ? "Manage My QRs" : "Get Started"}
             </Link>
           </div>
 
@@ -171,10 +195,10 @@ export default function LandingPage() {
               </li>
             </ul>
             <Link
-              to="/signup"
+              to={isLoggedIn ? "/billing" : "/signup"}
               className="block text-center w-full py-3 rounded-xl bg-white text-black font-bold hover:bg-gray-100 transition-all"
             >
-              Go Pro
+              {isLoggedIn ? "Upgrade Plan" : "Go Pro"}
             </Link>
           </div>
         </div>

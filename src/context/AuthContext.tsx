@@ -136,10 +136,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   /* ---------- Logout ---------- */
 
   const logout = () => {
+    // 1. Clear State
     setUser(null);
+
+    // 2. Clear LocalStorage
     localStorage.removeItem("user");
     localStorage.removeItem("token");
     localStorage.clear();
+
+    // 3. Clear Refresh Token Cookie
+    // This sets the cookie to expire immediately
+    document.cookie =
+      "refreshToken=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+
+    // 4. Redirect
     window.location.href = "/login";
   };
 
