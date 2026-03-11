@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, data } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import Sidebar from "../../components/layout/Sidebar";
 import Header from "../../components/layout/Header";
@@ -160,7 +160,7 @@ export default function Details() {
                   <div className="border-[12px] border-black p-8 flex flex-col items-center">
                     <div ref={qrRef} className="bg-white p-4 mb-8">
                       <QRCode
-                        value={`https://yourapp.com/${qrCode.qrId}`}
+                        value={qrCode.shortUrl}
                         size={200}
                         fgColor="#000000"
                         bgColor="#FFFFFF"

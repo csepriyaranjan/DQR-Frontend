@@ -19,8 +19,6 @@ export default function CreateQR() {
     shortUrl: string;
   } | null>(null);
 
-  
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
