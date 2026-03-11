@@ -5,6 +5,7 @@ import SignupPage from "../pages/auth/SignupPage";
 import Dashboard from "../pages/dashboard/page";
 import CreateQR from "../pages/create-qr/page";
 import Details from "../pages/details/page";
+import LandingPage from "../pages/landing/page";
 
 
 const routes: RouteObject[] = [
@@ -32,6 +33,7 @@ const routes: RouteObject[] = [
     path: "/details/:qrId",
     element: <Details />,
   },
+  {path: "/landing",element:<LandingPage />},
   {
     path: "*",
     element: <NotFound />,

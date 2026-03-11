@@ -74,18 +74,4 @@ export const qrApi = {
 
     return response.json();
   },
-
-  async redirect(qrId: string): Promise<string> {
-    const response = await fetch(`${API_BASE_URL}/qr/redirect/${qrId}`, {
-      method: "GET",
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to redirect");
-    } else {
-      const data = await response.json();
-      return data.destinationUrl;
-    }    
-  },
 };
