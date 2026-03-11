@@ -6,15 +6,15 @@ export interface User {
 }
 
 export interface QRItem {
-  qrId: string;
+  qrId?: string;
   name: string;
   destinationUrl: string;
-  todayScans: number;
-  totalScans: number;
-  updateCount: number;
+  shortUrl?: string;
+  todayScans?: number;
+  totalScans?: number;
+  updateCount?: number;
   createdAt?: string;
 }
-
 
 export interface Analytics {
   totalScans: number;

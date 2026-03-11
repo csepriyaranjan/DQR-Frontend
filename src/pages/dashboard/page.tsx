@@ -19,8 +19,8 @@ export default function Dashboard() {
   // Scoped loading state
   const [isLoading, setIsLoading] = useState(true);
 
-  const totalScans = qrCodes.reduce((sum, qr) => sum + qr.totalScans, 0);
-  const todayScans = qrCodes.reduce((sum, qr) => sum + qr.todayScans, 0);
+  const totalScans = qrCodes.reduce((sum, qr) => sum + (qr.totalScans ?? 0), 0);
+ const todayScans = qrCodes.reduce((sum, qr) => sum + (qr.todayScans ?? 0), 0);
 
  const fetchQRCodes = async (showSilence = false) => {
    try {

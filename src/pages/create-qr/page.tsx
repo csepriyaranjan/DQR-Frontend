@@ -19,17 +19,19 @@ export default function CreateQR() {
     shortUrl: string;
   } | null>(null);
 
+  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+    
     const newQR = { name, destinationUrl };
 
     try {
       const qr = await qrApi.create(authFetch, newQR);
       setCreatedQR({
-        qrId: qr.qrId,
-        shortUrl: qr.shortUrl,
+        qrId: qr.qrId ?? "",
+        shortUrl: qr.shortUrl ?? "",
       });
       setName("");
       setDestinationUrl("");

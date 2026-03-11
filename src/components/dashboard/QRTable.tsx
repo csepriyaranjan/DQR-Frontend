@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import type { QRCode as QRCodeType } from "../../data/mockData";
+import type { QRItem as QRCodeType } from "../../data/mockData";
 import { RiEditLine, RiFileListLine, RiDeleteBinLine } from "react-icons/ri";
 
 interface QRTableProps {

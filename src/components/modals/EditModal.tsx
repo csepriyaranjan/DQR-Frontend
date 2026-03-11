@@ -23,10 +23,10 @@ export default function EditModal({
     e.preventDefault();
 
     // Validation
-    if (qrCode.updateCount >= maxUpdates) {
-      notify(`Update limit reached (${maxUpdates} updates max)`, "error");
-      return;
-    }
+   if ((qrCode.updateCount ?? 0) >= maxUpdates) {
+     notify(`Update limit reached (${maxUpdates} updates max)`, "error");
+     return;
+   }
 
     if (!destinationUrl.trim()) {
       notify("Destination URL is required", "error");
@@ -91,7 +91,7 @@ export default function EditModal({
           <div className="bg-gray-50 rounded-lg p-3 text-sm flex justify-between items-center">
             <span className="text-gray-600 font-medium">Updates used</span>
             <span
-              className={`font-bold ${qrCode.updateCount >= maxUpdates ? "text-red-600" : "text-black"}`}
+              className={`font-bold ${ (qrCode.updateCount ?? 0) >= maxUpdates ? "text-red-600" : "text-black"}`}
             >
               {qrCode.updateCount} / {maxUpdates}
             </span>

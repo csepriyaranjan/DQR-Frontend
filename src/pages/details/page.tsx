@@ -1,4 +1,4 @@
-import { useParams, useNavigate, data } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState, useRef } from "react";
 import Sidebar from "../../components/layout/Sidebar";
 import Header from "../../components/layout/Header";
@@ -26,23 +26,23 @@ export default function Details() {
   const [loading, setLoading] = useState(true);
   const qrRef = useRef<HTMLDivElement>(null);
 
-useEffect(() => {
-  const fetchQR = async () => {
-    try {
-      setLoading(true);
+  useEffect(() => {
+    const fetchQR = async () => {
+      try {
+        setLoading(true);
 
-      const data = await qrApi.getOne(authFetch, qrId!);
+        const data = await qrApi.getOne(authFetch, qrId!);
 
-      setQrCode(data);
-    } catch (err: any) {
-      notify(err.message || "Failed to fetch QR code details", "error");
-    } finally {
-      setLoading(false);
-    }
-  };
+        setQrCode(data);
+      } catch (err: any) {
+        notify(err.message || "Failed to fetch QR code details", "error");
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  fetchQR();
-}, [qrId, authFetch]);
+    fetchQR();
+  }, [qrId, authFetch]);
 
   const downloadQR = async () => {
     if (!qrRef.current) return;
