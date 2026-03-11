@@ -1,3 +1,4 @@
+import { redirect } from "react-router-dom";
 import type { QRItem } from "../data/mockData";
 
 const API_BASE_URL = import.meta.env.VITE_BASE_URI;
@@ -72,5 +73,19 @@ export const qrApi = {
     }
 
     return response.json();
+  },
+
+  async redirect(qrId: string): Promise<string> {
+    const response = await fetch(`${API_BASE_URL}/qr/redirect/${qrId}`, {
+      method: "GET",
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to redirect");
+    } else {
+      const data = await response.json();
+      return data.destinationUrl;
+    }    
   },
 };
