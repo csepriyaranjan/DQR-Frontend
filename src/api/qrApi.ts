@@ -1,4 +1,3 @@
-import { redirect } from "react-router-dom";
 import type { QRItem } from "../data/mockData";
 
 const API_BASE_URL = import.meta.env.VITE_BASE_URI;
