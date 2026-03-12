@@ -32,8 +32,6 @@ const routes: RouteObject[] = [
     path: "/details/:qrId",
     element: <Details />,
   },
-  { path: "/landing", 
-    element: <LandingPage /> },
   {
     path: "*",
     element: <NotFound />,

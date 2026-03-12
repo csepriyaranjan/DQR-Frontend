@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import QRCode from "react-qr-code";
 import { useAuth } from "../../context/AuthContext";
 import { qrApi } from "../../api/qrApi";
 import Sidebar from "../../components/layout/Sidebar";
 import Header from "../../components/layout/Header";
 import { notify } from "../../utils/notify";
+import { toPng } from "html-to-image"; // Ensure this is imported
 import { BiClipboard, BiLoaderAlt, BiCheck } from "react-icons/bi";
+import { RiDownloadLine, RiQrCodeLine } from "react-icons/ri"; // Consistent icons
 
 export default function CreateQR() {
   const { authFetch } = useAuth();
@@ -13,16 +15,20 @@ export default function CreateQR() {
   const [name, setName] = useState("");
   const [destinationUrl, setDestinationUrl] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isExporting, setIsExporting] = useState(false); // Added state
   const [copied, setCopied] = useState(false);
   const [createdQR, setCreatedQR] = useState<{
     qrId: string;
     shortUrl: string;
+    name: string; // Store name for the filename
   } | null>(null);
+
+  const qrRef = useRef<HTMLDivElement>(null); // Added Ref
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    
+
     const newQR = { name, destinationUrl };
 
     try {
@@ -30,11 +36,12 @@ export default function CreateQR() {
       setCreatedQR({
         qrId: qr.qrId ?? "",
         shortUrl: qr.shortUrl ?? "",
+        name: name, // Save the name for the file download
       });
       setName("");
       setDestinationUrl("");
       notify("QR Code created successfully!", "success");
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
       notify("Failed to create QR code. Please try again.", "error");
     } finally {
@@ -50,40 +57,41 @@ export default function CreateQR() {
     setTimeout(() => setCopied(false), 2000);
   };
 
- const downloadQR = () => {
-   const svg = document.getElementById("qr-code") as SVGSVGElement | null;
-   if (!svg) return;
+  const downloadQR = async () => {
+    if (!qrRef.current) return;
 
-   const svgData = new XMLSerializer().serializeToString(svg);
+    // Target the actual SVG inside the ref div
+    const svgElement = qrRef.current.querySelector("svg");
+    if (!svgElement) {
+      notify("QR code element not found", "error");
+      return;
+    }
 
-   const canvas = document.createElement("canvas");
-   const ctx = canvas.getContext("2d");
+    try {
+      setIsExporting(true);
+      notify("Generating high-resolution asset...", "info");
 
-   if (!ctx) {
-     console.error("Canvas context not available");
-     return;
-   }
+      const dataUrl = await toPng(svgElement as unknown as HTMLElement, {
+        backgroundColor: "#ffffff",
+        pixelRatio: 3,
+        skipFonts: true,
+      });
 
-   const img = new Image();
+      const downloadLink = document.createElement("a");
+      downloadLink.download = `QR-${createdQR?.name || "code"}.png`;
+      downloadLink.href = dataUrl;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
 
-   img.onload = () => {
-     canvas.width = 256;
-     canvas.height = 256;
-
-     ctx.drawImage(img, 0, 0);
-
-     const pngFile = canvas.toDataURL("image/png");
-
-     const downloadLink = document.createElement("a");
-     downloadLink.download = `${createdQR?.qrId || "qrcode"}.png`;
-     downloadLink.href = pngFile;
-     downloadLink.click();
-   };
-
-   img.src =
-     "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
- };
-
+      notify("Asset exported successfully", "success");
+    } catch (err) {
+      console.error("Export Error:", err);
+      notify("Desktop export failed. Try again.", "error");
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   return (
     <div className="flex h-screen bg-white">
@@ -115,7 +123,7 @@ export default function CreateQR() {
                         value={name}
                         disabled={isSubmitting}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black outline-none transition-all disabled:bg-gray-50"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black outline-none transition-all disabled:bg-gray-50 text-black"
                         placeholder="e.g., Summer Campaign"
                         required
                       />
@@ -130,7 +138,7 @@ export default function CreateQR() {
                         value={destinationUrl}
                         disabled={isSubmitting}
                         onChange={(e) => setDestinationUrl(e.target.value)}
-                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black outline-none transition-all disabled:bg-gray-50"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black outline-none transition-all disabled:bg-gray-50 text-black"
                         placeholder="https://your-website.com"
                         required
                       />
@@ -163,7 +171,8 @@ export default function CreateQR() {
                     </h2>
 
                     <div className="bg-white border border-gray-100 rounded-lg p-8 mb-6 flex items-center justify-center shadow-inner">
-                      <div id="qr-code-preview">
+                      {/* Attached Ref here */}
+                      <div ref={qrRef}>
                         <QRCode
                           value={createdQR.shortUrl}
                           size={256}
@@ -203,10 +212,15 @@ export default function CreateQR() {
 
                       <button
                         onClick={downloadQR}
-                        className="w-full bg-black text-white py-3 rounded-lg font-bold hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
+                        disabled={isExporting}
+                        className="w-full bg-black text-white py-3 rounded-lg font-bold hover:bg-gray-800 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                       >
-                        <i className="ri-download-line text-lg"></i>
-                        Download PNG
+                        {isExporting ? (
+                          <BiLoaderAlt className="animate-spin" size={16} />
+                        ) : (
+                          <RiDownloadLine size={16} />
+                        )}
+                        {isExporting ? "Exporting..." : "Download PNG"}
                       </button>
 
                       <button
@@ -220,7 +234,7 @@ export default function CreateQR() {
                 ) : (
                   <div className="bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl p-12 flex flex-col items-center justify-center text-center h-full min-h-[400px]">
                     <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                      <i className="ri-qr-code-line text-4xl text-gray-300"></i>
+                      <RiQrCodeLine className="text-4xl text-gray-300" />
                     </div>
                     <p className="text-gray-500 font-medium">
                       Fill in the details to generate <br /> your dynamic QR

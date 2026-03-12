@@ -11,11 +11,7 @@ export default function LandingPage() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    // Simple check for the 'refreshToken' in cookies
-    const hasToken = document.cookie
-      .split("; ")
-      .find((row) => row.startsWith("refreshToken="));
-
+    const hasToken = localStorage.getItem("token") || cookieStore.get("refeshtoken");
     setIsLoggedIn(!!hasToken);
   }, []);
 

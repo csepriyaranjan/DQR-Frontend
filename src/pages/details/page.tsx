@@ -6,8 +6,8 @@ import QRCode from "react-qr-code";
 import { toPng } from "html-to-image";
 import { qrApi } from "../../api/qrApi";
 import { useAuth } from "../../context/AuthContext";
-import { notify } from "../../utils/notify"; // Import notify
-import { BiLoaderAlt } from "react-icons/bi"; // Import Loader icon
+import { notify } from "../../utils/notify";
+import { BiLoaderAlt } from "react-icons/bi";
 
 import {
   RiArrowLeftLine,
@@ -24,15 +24,14 @@ export default function Details() {
 
   const [qrCode, setQrCode] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
   const qrRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const fetchQR = async () => {
       try {
         setLoading(true);
-
         const data = await qrApi.getOne(authFetch, qrId!);
-
         setQrCode(data);
       } catch (err: any) {
         notify(err.message || "Failed to fetch QR code details", "error");
@@ -46,17 +45,38 @@ export default function Details() {
 
   const downloadQR = async () => {
     if (!qrRef.current) return;
+
+    // Target the actual SVG inside the ref div
+    const svgElement = qrRef.current.querySelector("svg");
+    if (!svgElement) {
+      notify("QR code element not found", "error");
+      return;
+    }
+
     try {
-      const dataUrl = await toPng(qrRef.current, {
+      setIsExporting(true);
+      notify("Generating high-resolution asset...", "info");
+
+      // html-to-image handles the canvas conversion safely for desktop
+      const dataUrl = await toPng(svgElement as unknown as HTMLElement, {
         backgroundColor: "#ffffff",
+        pixelRatio: 3, 
+        skipFonts: true,
       });
-      const link = document.createElement("a");
-      link.download = `${qrCode?.name || "qr-code"}.png`;
-      link.href = dataUrl;
-      link.click();
+
+      const downloadLink = document.createElement("a");
+      downloadLink.download = `${qrCode?.name || "qrcode"}.png`;
+      downloadLink.href = dataUrl;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
+
       notify("Asset exported successfully", "success");
     } catch (err) {
-      notify("Export failed", "error");
+      console.error("Export Error:", err);
+      notify("Desktop export failed. Try again.", "error");
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -71,7 +91,6 @@ export default function Details() {
         />
 
         <main className="p-8 lg:p-16 max-w-6xl w-full mx-auto">
-          {/* Persistent Navigation */}
           <button
             onClick={() => navigate("/dashboard")}
             className="flex items-center gap-2 text-xs font-bold uppercase hover:opacity-50 transition-opacity mb-12"
@@ -80,7 +99,6 @@ export default function Details() {
           </button>
 
           {loading ? (
-            /* Scoped Loading State */
             <div className="flex flex-col items-center justify-center py-24">
               <BiLoaderAlt className="w-12 h-12 animate-spin mb-4" />
               <p className="font-mono text-xs tracking-widest uppercase text-gray-400">
@@ -129,7 +147,7 @@ export default function Details() {
                         href={qrCode.destinationUrl}
                         target="_blank"
                         rel="noreferrer"
-                        className="text-sm font-medium hover:underline truncate max-w-[250px]"
+                        className="text-sm font-medium hover:underline truncate max-w-62.5"
                       >
                         {qrCode.destinationUrl}
                       </a>
@@ -157,7 +175,7 @@ export default function Details() {
 
                 {/* QR Visual Section */}
                 <div className="lg:col-span-5">
-                  <div className="border-[12px] border-black p-8 flex flex-col items-center">
+                  <div className="border-12 border-black p-8 flex flex-col items-center">
                     <div ref={qrRef} className="bg-white p-4 mb-8">
                       <QRCode
                         value={qrCode.shortUrl}
@@ -170,15 +188,24 @@ export default function Details() {
 
                     <button
                       onClick={downloadQR}
-                      className="w-full py-4 bg-black text-white text-xs font-bold uppercase tracking-[0.3em] hover:bg-gray-800 transition-all flex items-center justify-center gap-2"
+                      disabled={isExporting}
+                      className={`w-full py-4 bg-black text-white text-xs font-bold uppercase tracking-[0.3em] transition-all flex items-center justify-center gap-2 ${
+                        isExporting
+                          ? "opacity-50 cursor-not-allowed"
+                          : "cursor-pointer hover:bg-gray-800"
+                      }`}
                     >
-                      <RiDownloadLine size={16} />
-                      Export Asset
+                      {isExporting ? (
+                        <BiLoaderAlt className="animate-spin" size={16} />
+                      ) : (
+                        <RiDownloadLine size={16} />
+                      )}
+                      {isExporting ? "Exporting..." : "Export Asset"}
                     </button>
 
                     <p className="mt-6 text-[10px] leading-relaxed text-gray-400 text-center uppercase tracking-widest">
                       Validated Matrix Code <br />
-                      Property of {qrCode.name.toUpperCase()}
+                      Property of {qrCode.name?.toUpperCase()}
                     </p>
                   </div>
                 </div>
