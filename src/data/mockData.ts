@@ -27,7 +27,7 @@ export const PLAN_LIMITS = {
     maxUpdates: 5
   },
   pro: {
-    maxQRCodes: 20,
+    maxQRCodes: 50,
     maxUpdates: 20
   }
 };

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { notify } from "../../utils/notify"; // Import notify
-import { BiLoaderAlt } from "react-icons/bi"; // Import Loader icon
+import { BiLoaderAlt, BiQrScan } from "react-icons/bi";
 
 const LoginPage: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -20,8 +20,7 @@ const LoginPage: React.FC = () => {
       await login(email, password);
       notify("Login successful. Welcome back!", "success");
       navigate("/dashboard");
-    } catch (err: any) {
-      // Use notify instead of local error state
+    } catch {
       notify("Invalid email or password. Please try again.", "error");
     } finally {
       setLoading(false);
@@ -29,60 +28,32 @@ const LoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="w-full max-w-md animate-in fade-in slide-in-from-bottom-4 duration-500">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
-            Welcome Back
-          </h1>
-          <p className="text-gray-600 mt-2">
-            Please enter your details to sign in.
-          </p>
-        </div>
-
-        <div className="bg-white border border-gray-200 rounded-xl shadow-sm p-8">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-semibold text-gray-700 mb-1"
-              >
-                Email Address
-              </label>
+    <div className="auth-page">
+      <aside className="auth-aside"><Link to="/" className="auth-brand"><span className="auth-brand-icon"><BiQrScan /></span>QRFlow</Link><div className="auth-aside-content"><p className="auth-eyebrow">Welcome back to the signal</p><h2>Make every scan <em>matter.</em></h2><p>Your QR workspace keeps campaigns moving, destinations flexible, and useful audience signals in one place.</p></div><p className="auth-aside-footer">The physical world, made clickable.</p></aside>
+      <main className="auth-main"><div className="auth-form-wrap"><p className="auth-kicker">Sign in</p><h1>Welcome back.</h1><p className="auth-subtitle">Enter your details to continue to your QRFlow workspace.</p><form onSubmit={handleSubmit} className="auth-form">
+            <div className="auth-field">
+              <label htmlFor="email">Email address</label>
               <input
                 id="email"
                 type="email"
                 value={email}
                 disabled={loading}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black outline-none transition-all disabled:bg-gray-50 disabled:text-gray-400"
+                className=""
                 placeholder="name@company.com"
                 required
               />
             </div>
 
-            <div>
-              <div className="flex justify-between mb-1">
-                <label
-                  htmlFor="password"
-                  className="text-sm font-semibold text-gray-700"
-                >
-                  Password
-                </label>
-                <button
-                  type="button"
-                  className="text-xs text-gray-500 hover:text-black transition-colors"
-                >
-                  Forgot?
-                </button>
-              </div>
+            <div className="auth-field">
+              <div className="auth-password-row"><label htmlFor="password">Password</label><button type="button" className="auth-forgot">Forgot?</button></div>
               <input
                 id="password"
                 type="password"
                 value={password}
                 disabled={loading}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black outline-none transition-all disabled:bg-gray-50 disabled:text-gray-400"
+                className=""
                 placeholder="••••••••"
                 required
               />
@@ -91,7 +62,7 @@ const LoginPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-lg font-bold text-white transition-all bg-black hover:bg-gray-800 disabled:bg-gray-700 flex items-center justify-center gap-2"
+              className="auth-submit"
             >
               {loading ? (
                 <>
@@ -102,16 +73,7 @@ const LoginPage: React.FC = () => {
                 "Log In"
               )}
             </button>
-          </form>
-
-          <div className="mt-6 text-center text-sm text-gray-600">
-            Don't have an account?{" "}
-            <Link to="/signup" className="text-black font-bold hover:underline">
-              Sign up
-            </Link>
-          </div>
-        </div>
-      </div>
+          </form><p className="auth-footnote">Don't have an account? <Link to="/signup">Sign up</Link></p><p className="auth-legal">By continuing, you agree to our <Link to="/terms">Terms</Link> and <Link to="/privacy">Privacy Policy</Link>.</p></div></main>
     </div>
   );
 };

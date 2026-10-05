@@ -5,6 +5,8 @@ import { useAuth } from "../../context/AuthContext";
 import {
   RiDashboardLine,
   RiQrCodeLine,
+  RiPaletteLine,
+  RiBankCardLine,
   RiLogoutBoxLine,
   RiMenuLine,
   RiCloseLine,
@@ -20,6 +22,8 @@ export default function Sidebar() {
   const menuItems = [
     { path: "/dashboard", label: "Dashboard", icon: RiDashboardLine },
     { path: "/create-qr", label: "Create QR", icon: RiQrCodeLine },
+    { path: "/brand-studio", label: "Brand Studio", icon: RiPaletteLine },
+    { path: "/payment", label: "Plans & payment", icon: RiBankCardLine },
   ];
 
   const handleLogout = () => {
@@ -28,15 +32,15 @@ export default function Sidebar() {
   };
 
   const SidebarContent = (
-    <div className="w-64 bg-white h-full flex flex-col border-r border-gray-200">
+    <div className="app-sidebar">
       {/* Logo */}
-      <div className="p-6 border-b border-gray-200">
-        <h1 className="text-2xl font-bold text-black">DQR</h1>
+      <div className="app-logo">
+        <div className="auth-brand"><span className="auth-brand-icon"><RiQrCodeLine /></span>QRFlow</div>
       </div>
 
       {/* Menu */}
-      <nav className="flex-1 p-4">
-        <div className="space-y-2">
+      <nav className="app-nav">
+        <div>
           {menuItems.map((item) => {
             const Icon = item.icon;
 
@@ -47,14 +51,14 @@ export default function Sidebar() {
                   navigate(item.path);
                   setOpen(false);
                 }}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
-                  location.pathname === item.path
-                    ? "bg-black text-white"
-                    : "text-gray-700 hover:bg-gray-100"
+                className={`app-nav-button ${
+                    location.pathname === item.path || (item.path === "/brand-studio" && location.pathname.startsWith("/brand-studio"))
+                    ? "active"
+                    : ""
                 }`}
               >
                 <Icon className="text-lg" />
-                <span className="font-medium">{item.label}</span>
+                <span>{item.label}</span>
               </button>
             );
           })}
@@ -62,20 +66,20 @@ export default function Sidebar() {
       </nav>
 
       {/* User */}
-      <div className="p-4 border-t border-gray-200">
-        <div className="bg-gray-50 rounded-lg p-4 mb-3">
-          <p className="text-sm font-medium text-black">{user?.email}</p>
-          <p className="text-xs text-gray-600 mt-1 capitalize">
+      <div>
+        <div className="app-user">
+          <p className="app-user-email">{user?.email}</p>
+          <p className="app-user-plan">
             {user?.plan} Plan
           </p>
         </div>
 
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100"
+          className="app-logout"
         >
           <RiLogoutBoxLine className="text-lg" />
-          <span className="font-medium">Logout</span>
+          <span>Log out</span>
         </button>
       </div>
     </div>
@@ -84,19 +88,12 @@ export default function Sidebar() {
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden lg:flex h-screen">{SidebarContent}</div>
+      <div className="app-sidebar-slot hidden lg:flex">{SidebarContent}</div>
 
       {/* Floating Button (Mobile Only) */}
       <button
         onClick={() => setOpen(true)}
-        className="lg:hidden fixed bottom-6 left-6 z-50
-        w-12 h-12 flex items-center justify-center
-        rounded-full
-        bg-red-100 backdrop-blur-md
-        border border-white/40
-        shadow-lg
-        hover:bg-red-300/90
-        transition"
+        className="lg:hidden fixed bottom-6 left-6 z-50 w-12 h-12 flex items-center justify-center rounded-full bg-[#c8ef4d] border border-[#153d2a] shadow-lg"
       >
         <RiMenuLine className="text-xl text-black" />
       </button>
@@ -111,12 +108,13 @@ export default function Sidebar() {
           />
 
           {/* Sidebar */}
-          <div className="relative">
+          <div className="app-drawer">
             {SidebarContent}
 
             <button
               onClick={() => setOpen(false)}
-              className="absolute top-4 right-4"
+              className="app-drawer-close"
+              aria-label="Close navigation"
             >
               <RiCloseLine className="text-2xl" />
             </button>

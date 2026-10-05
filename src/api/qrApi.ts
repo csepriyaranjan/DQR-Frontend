@@ -2,6 +2,16 @@ import type { QRItem } from "../data/mockData";
 
 const API_BASE_URL = import.meta.env.VITE_BASE_URI;
 
+export interface QRAnalytics {
+  qrId: string;
+  days: number;
+  totalScans: number;
+  uniqueScans: number;
+  daily: Array<{ date: string; scans: number }>;
+  devices: Array<{ name: string; scans: number }>;
+  referrers: Array<{ name: string; scans: number }>;
+}
+
 export const qrApi = {
   async getAll(authFetch: any): Promise<QRItem[]> {
     const response = await authFetch(`${API_BASE_URL}/qr/get-all-qr`, {
@@ -69,6 +79,24 @@ export const qrApi = {
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.message || "Failed to fetch QR");
+    }
+
+    return response.json();
+  },
+
+  async getAnalytics(
+    authFetch: any,
+    qrId: string,
+    days = 30,
+  ): Promise<QRAnalytics> {
+    const response = await authFetch(
+      `${API_BASE_URL}/qr/analytics/${qrId}?days=${days}`,
+      { method: "GET" },
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || "Failed to fetch analytics");
     }
 
     return response.json();

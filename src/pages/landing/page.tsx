@@ -31,7 +31,7 @@ export default function LandingPage() {
         <FeatureGrid />
         <AnalyticsPreview />
         <UseCasesSection />
-        <PricingSection />
+        <PricingSection isLoggedIn={isLoggedIn} />
         <section className="cta-section"><p className="eyebrow">Your next signal starts here</p><h2>Make something<br /><em>worth scanning.</em></h2><p>Free to start. Ready when you are.</p><Link to={isLoggedIn ? "/dashboard" : "/signup"} className="button button-dark">{isLoggedIn ? "Open your workspace" : "Start for free"}<BiArrowToRight /></Link></section>
       </main>
       <LandingFooter />

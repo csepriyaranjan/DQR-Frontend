@@ -12,14 +12,14 @@ export default function StatsCard({
   icon: Icon,
 }: StatsCardProps) {
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-6 flex items-center justify-between">
+    <div className="app-stat-card">
       <div>
-        <p className="text-gray-500 text-sm">{title}</p>
-        <p className="text-3xl font-bold text-black mt-1">{value}</p>
+        <p className="app-stat-label">{title}</p>
+        <p className="app-stat-value">{value}</p>
       </div>
 
-      <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-        <Icon className="text-2xl text-black" />
+      <div className="app-stat-icon">
+        <Icon />
       </div>
     </div>
   );
