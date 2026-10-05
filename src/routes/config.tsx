@@ -6,6 +6,7 @@ import Dashboard from "../pages/dashboard/page";
 import CreateQR from "../pages/create-qr/page";
 import Details from "../pages/details/page";
 import LandingPage from "../pages/landing/page";
+import LegalPage from "../pages/legal/page";
 
 const routes: RouteObject[] = [
   {
@@ -31,6 +32,14 @@ const routes: RouteObject[] = [
   {
     path: "/details/:qrId",
     element: <Details />,
+  },
+  {
+    path: "/privacy",
+    element: <LegalPage />,
+  },
+  {
+    path: "/terms",
+    element: <LegalPage />,
   },
   {
     path: "*",
