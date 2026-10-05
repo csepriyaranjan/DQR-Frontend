@@ -5,6 +5,7 @@ import LandingNav from "../../components/landing/LandingNav";
 import HeroGraphic from "../../components/landing/HeroGraphic";
 import FeatureGrid from "../../components/landing/FeatureGrid";
 import AnalyticsPreview from "../../components/landing/AnalyticsPreview";
+import UseCasesSection from "../../components/landing/UseCasesSection";
 import PricingSection from "../../components/landing/PricingSection";
 import LandingFooter from "../../components/landing/LandingFooter";
 import "./Landing.css";
@@ -29,6 +30,7 @@ export default function LandingPage() {
         <div className="logo-strip"><span>Northstar</span><span>Kinfolk</span><span>Notionary</span><span>Onda</span><span>Kindred</span></div>
         <FeatureGrid />
         <AnalyticsPreview />
+        <UseCasesSection />
         <PricingSection />
         <section className="cta-section"><p className="eyebrow">Your next signal starts here</p><h2>Make something<br /><em>worth scanning.</em></h2><p>Free to start. Ready when you are.</p><Link to={isLoggedIn ? "/dashboard" : "/signup"} className="button button-dark">{isLoggedIn ? "Open your workspace" : "Start for free"}<BiArrowToRight /></Link></section>
       </main>

@@ -1,5 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap');
 
+.signal-points { display:flex; flex-wrap:wrap; gap:9px; margin:36px 0; }
+.signal-points span { border:1px solid var(--line); border-radius:20px; padding:9px 12px; color:var(--green); font-size:11px; }
+.chart-heading strong { font-size:29px; }
+.use-cases-section { border-top:1px solid var(--line); }
+.use-case-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:15px; }
+.use-case-card { position:relative; min-height:280px; padding:26px 25px; background:#e9ede6; border-radius:8px; overflow:hidden; }
+.use-case-label { color:var(--green); text-transform:uppercase; letter-spacing:.13em; font-size:9px; font-weight:700; margin:42px 0 12px; }
+.use-case-card h3 { max-width:220px; font-size:21px; line-height:1.1; letter-spacing:-.05em; margin:0 0 12px; }
+.use-case-card > p:last-of-type { color:var(--muted); max-width:250px; font-size:12px; line-height:1.6; }
+.use-case-line { position:absolute; left:25px; bottom:24px; width:45px; height:2px; background:var(--lime); }
+
+@media (max-width:800px) { .use-case-grid { grid-template-columns:1fr; } }
+
 :root { --ink:#111512; --muted:#69716a; --paper:#f4f5f0; --line:#dfe4dc; --green:#153d2a; --lime:#c8ef4d; }
 * { box-sizing:border-box; }
 html { scroll-behavior:smooth; }
