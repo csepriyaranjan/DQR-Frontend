@@ -1,8 +1,8 @@
 export interface User {
+  name?: string;
   email: string;
-  password: string;
   plan: 'free' | 'pro';
-  qrCount: number; 
+  qrCount?: number;
 }
 
 export interface QRItem {

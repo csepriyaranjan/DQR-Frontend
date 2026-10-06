@@ -3,6 +3,7 @@ import {
   useContext,
   useState,
   useEffect,
+  useCallback,
   type ReactNode,
 } from "react";
 import { type User } from "../data/mockData";
@@ -13,7 +14,7 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string) => Promise<void>;
+  signup: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   authFetch: (url: string, options?: RequestInit) => Promise<Response>;
 }
@@ -24,9 +25,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  /* ---------- Refresh Token ---------- */
+  const logout = useCallback(async () => {
+    try {
+      await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
+    setUser(null);
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  }, []);
 
-  const refreshAccessToken = async () => {
+  const refreshAccessToken = useCallback(async () => {
     try {
       const res = await fetch(`${API_BASE_URL}/auth/refresh`, {
         method: "POST",
@@ -34,23 +48,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
 
       if (!res.ok) {
-        logout();
+        await logout();
         return null;
       }
 
       const data = await res.json();
       localStorage.setItem("token", data.accessToken);
-
       return data.accessToken;
     } catch {
-      logout();
+      await logout();
       return null;
     }
-  };
+  }, [logout]);
 
   /* ---------- Auth Fetch ---------- */
 
-  const authFetch = async (url: string, options: RequestInit = {}) => {
+  const authFetch = useCallback(async (url: string, options: RequestInit = {}) => {
     let token = localStorage.getItem("token");
 
     let res = await fetch(url, {
@@ -80,18 +93,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     return res;
-  };
+  }, [refreshAccessToken]);
 
   /* ---------- Initial Load ---------- */
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
+    localStorage.removeItem("user");
 
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
-  }, []);
+    const loadCurrentUser = async () => {
+      if (!localStorage.getItem("token")) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const response = await authFetch(`${API_BASE_URL}/auth/me`, { method: "GET" });
+        if (!response.ok) throw new Error("Failed to load account");
+        setUser(await response.json());
+      } catch {
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void loadCurrentUser();
+  }, [authFetch]);
 
   /* ---------- Login ---------- */
 
@@ -110,21 +137,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const data = await res.json();
 
     setUser(data.user);
-    
-    localStorage.setItem("user", JSON.stringify(data.user));
     localStorage.setItem("token", data.accessToken);
   };
 
   /* ---------- Signup ---------- */
 
-  const signup = async (email: string, password: string) => {
+  const signup = async (name: string, email: string, password: string) => {
     const res = await fetch(`${API_BASE_URL}/auth/register`, {
       method: "POST",
       credentials: "include",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ name, email, password }),
     });
 
     if (!res.ok) {
@@ -132,23 +157,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw new Error(err.message || "Signup failed");
     }
   };
-
-  /* ---------- Logout ---------- */
-
-const logout = async () => {
-  try {
-    await fetch(`${API_BASE_URL}/auth/logout`, {
-      method: "POST",
-      credentials: "include", 
-    });
-  } catch (error) {
-    console.error("Logout error:", error);
-  }
-  setUser(null);
-  localStorage.removeItem("user");
-  localStorage.removeItem("token");
-  window.location.href = "/login";
-};
 
   return (
     <AuthContext.Provider

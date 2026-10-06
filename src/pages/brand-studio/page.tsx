@@ -14,7 +14,7 @@ import { notify } from "../../utils/notify";
 export default function BrandStudioPage() {
   const { qrId } = useParams();
   const navigate = useNavigate();
-  const { user, authFetch } = useAuth();
+  const { user, loading: authLoading, authFetch } = useAuth();
   const [qrCodes, setQrCodes] = useState<QRItem[]>([]);
   const [selectedQrId, setSelectedQrId] = useState(qrId || "");
   const [loading, setLoading] = useState(true);
@@ -52,9 +52,11 @@ export default function BrandStudioPage() {
             </div>
             <div className="brand-page-lockup"><RiPaletteLine /><span>Studio tools</span></div>
           </div>
-          <DemoBrandCard />
+          {!authLoading && !isPro && <DemoBrandCard />}
 
-          {!isPro ? (
+          {authLoading ? (
+            <div className="brand-page-loading"><BiLoaderAlt className="animate-spin" /><span>Loading your account...</span></div>
+          ) : !isPro ? (
             <section className="brand-upgrade-card">
               <span className="brand-upgrade-icon"><BiLockAlt /></span>
               <p className="details-kicker">Pro workspace</p>
@@ -69,7 +71,7 @@ export default function BrandStudioPage() {
           ) : (
             <>
               <div className="brand-selector-row"><label htmlFor="brand-qr-select">Choose a QR code</label><select id="brand-qr-select" value={selectedQrId} onChange={(event) => setSelectedQrId(event.target.value)}>{qrCodes.map((qr) => <option value={qr.qrId} key={qr.qrId}>{qr.name}</option>)}</select></div>
-              {selectedQr && <BrandExportPanel qrCode={selectedQr} />}
+              {selectedQr && <BrandExportPanel qrCode={selectedQr} identityName={user?.name || ""} />}
             </>
           )}
         </main>

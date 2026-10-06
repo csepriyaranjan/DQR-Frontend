@@ -1,12 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import QRCode from "react-qr-code";
-import { toPng } from "html-to-image";
 import Sidebar from "../../components/layout/Sidebar";
 import Header from "../../components/layout/Header";
 import { qrApi, type QRAnalytics } from "../../api/qrApi";
 import { useAuth } from "../../context/AuthContext";
 import { notify } from "../../utils/notify";
+import { exportQrPng } from "../../utils/pngExport";
 import { BiLoaderAlt } from "react-icons/bi";
 
 import {
@@ -49,18 +49,15 @@ export default function Details() {
   }, [qrId, authFetch]);
 
   const exportSimpleQr = async () => {
-    if (!simpleExportRef.current || !qrCode?.shortUrl) {
+    const qrSvg = simpleExportRef.current?.querySelector("svg");
+    if (!qrSvg || !qrCode?.shortUrl) {
       notify("Backend short URL is not available for this QR code.", "error");
       return;
     }
 
     try {
       setIsSimpleExporting(true);
-      const dataUrl = await toPng(simpleExportRef.current, { cacheBust: true, pixelRatio: 3 });
-      const link = document.createElement("a");
-      link.download = `${qrCode.name || "qr-code"}.png`;
-      link.href = dataUrl;
-      link.click();
+      await exportQrPng(qrSvg, `${qrCode.name || "qr-code"}.png`);
       notify("QR exported", "success");
     } catch {
       notify("Export failed. Try again.", "error");

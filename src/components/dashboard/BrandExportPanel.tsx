@@ -1,16 +1,17 @@
 import { useRef, useState } from "react";
 import QRCode from "react-qr-code";
-import { toPng } from "html-to-image";
 import { BiLoaderAlt } from "react-icons/bi";
 import { RiDownloadLine, RiPaletteLine } from "react-icons/ri";
 import type { QRItem } from "../../data/mockData";
 import { notify } from "../../utils/notify";
+import { exportBrandedQrPng } from "../../utils/pngExport";
 
 interface BrandExportPanelProps {
   qrCode: QRItem;
+  identityName: string;
 }
 
-export default function BrandExportPanel({ qrCode }: BrandExportPanelProps) {
+export default function BrandExportPanel({ qrCode, identityName }: BrandExportPanelProps) {
   const exportRef = useRef<HTMLDivElement>(null);
   const [brandName, setBrandName] = useState(qrCode.name);
   const [brandDescription, setBrandDescription] = useState("Scan to discover more");
@@ -26,14 +27,10 @@ export default function BrandExportPanel({ qrCode }: BrandExportPanelProps) {
 
     try {
       setIsExporting(true);
-      const dataUrl = await toPng(exportRef.current, {
-        cacheBust: true,
-        pixelRatio: 3,
-      });
-      const link = document.createElement("a");
-      link.download = `${brandName || qrCode.name}-branded-qr.png`;
-      link.href = dataUrl;
-      link.click();
+      await exportBrandedQrPng(
+        exportRef.current,
+        `${brandName || qrCode.name}-branded-qr.png`,
+      );
       notify("Branded QR exported", "success");
     } catch (error) {
       console.error("Branded QR export failed:", error);
@@ -58,7 +55,7 @@ export default function BrandExportPanel({ qrCode }: BrandExportPanelProps) {
       <div className="brand-studio-grid">
         <div ref={exportRef} className="brand-export-card" style={{ backgroundColor: brandColor }}>
           <div className="brand-export-card-top" style={{ color: brandColor }}>
-            <span>QRFlow identity</span>
+            <span>{identityName || "Your"} Identity</span>
             <span>Live</span>
           </div>
           <p className="brand-export-name">{brandName || qrCode.name}</p>

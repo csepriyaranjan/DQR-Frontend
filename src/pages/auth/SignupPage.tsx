@@ -5,6 +5,7 @@ import { notify } from "../../utils/notify";
 import { BiLoaderAlt, BiQrScan } from "react-icons/bi";
 
 const SignupPage: React.FC = () => {
+  const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -24,7 +25,7 @@ const SignupPage: React.FC = () => {
     setLoading(true);
 
     try {
-      await signup(email, password);
+      await signup(name, email, password);
       notify("Account created! Please log in.", "success");
       navigate("/login");
     } catch (err: unknown) {
@@ -38,6 +39,20 @@ const SignupPage: React.FC = () => {
     <div className="auth-page">
       <aside className="auth-aside"><Link to="/" className="auth-brand"><span className="auth-brand-icon"><BiQrScan /></span>QRFlow</Link><div className="auth-aside-content"><p className="auth-eyebrow">Start with a signal</p><h2>Build something <em>worth scanning.</em></h2><p>Create dynamic codes that stay flexible after print, with a calm workspace for every campaign and destination.</p></div><p className="auth-aside-footer">The physical world, made clickable.</p></aside>
       <main className="auth-main"><div className="auth-form-wrap"><p className="auth-kicker">Create your workspace</p><h1>Start simply.</h1><p className="auth-subtitle">Set up your account and publish your first dynamic QR code.</p><form onSubmit={handleSubmit} className="auth-form">
+            <div className="auth-field">
+              <label htmlFor="name">Your name or business name</label>
+              <input
+                id="name"
+                type="text"
+                value={name}
+                disabled={loading}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Your name or business"
+                maxLength={100}
+                autoComplete="name"
+                required
+              />
+            </div>
             <div className="auth-field">
               <label htmlFor="email">Email address</label>
               <input
